@@ -12,6 +12,9 @@ database:
     # Yaml file name
     file: "data.yml"
 
+# In seconds
+blockstop-update-interval: 60
+
 messages:
 
   # The message sent when the player tries to view the leaderboard while it is updating
@@ -19,6 +22,7 @@ messages:
     - "&c&l(!) &cLeaderboard is updating! Try again later."
 
   blockstop:
-    - ""
-    - ""
-    - ""
+    - "&e&m-------&f&m-------&e&m--------&f&m--------&e&m--------&f&m-------&e&m-------"
+    - "&e&lGANGS TOP"
+    - "{FOR_EACH_GANG} &f&l#%position%. &e%gang% &8&7%blocks% Blocks"
+    - "&e&m-------&f&m-------&e&m--------&f&m--------&e&m--------&f&m-------&e&m-------"

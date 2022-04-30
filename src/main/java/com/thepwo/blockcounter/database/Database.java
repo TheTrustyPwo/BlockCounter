@@ -20,7 +20,8 @@ public abstract class Database {
 
     private void startAutoSave() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> this.blockCache.keySet()
-                .forEach(uuid -> this.save(uuid, false)), 10L, 30L);
+                .forEach(uuid -> this.save(uuid, false)), 10L,
+                this.plugin.getConfig().getLong("database.autosave-interval") * 20L);
     }
 
     public void cache(UUID uuid) {

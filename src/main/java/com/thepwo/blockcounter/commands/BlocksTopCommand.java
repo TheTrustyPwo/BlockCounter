@@ -1,8 +1,12 @@
 package com.thepwo.blockcounter.commands;
 
 import com.thepwo.blockcounter.BlockCounter;
+import com.thepwo.blockcounter.utils.number.NumberUtils;
+import com.thepwo.blockcounter.utils.number.enums.NumberFormatType;
+import com.thepwo.blockcounter.utils.string.StringUtils;
 import net.brcdev.gangs.GangsPlusApi;
 import net.brcdev.gangs.gang.Gang;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,29 +19,34 @@ import java.util.stream.Collectors;
 
 public class BlocksTopCommand implements CommandExecutor {
     private final BlockCounter plugin = BlockCounter.getPlugin();
-    private Map<Gang, Long> gangBlocks;
+    private Map<Gang, Long> topGangBlocks;
     private boolean updating;
 
     public BlocksTopCommand() {
-        this.gangBlocks = new LinkedHashMap<>();
+        this.topGangBlocks = new LinkedHashMap<>();
         updating = false;
         startBlockTopUpdate();
     }
 
     private void startBlockTopUpdate() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::updateBlockTop, 10L,
+                this.plugin.getConfig().getLong("blockstop-update-interval") * 20L);
+    }
+
+    private void updateBlockTop() {
         this.updating = true;
 
-        this.gangBlocks.clear();
+        this.topGangBlocks.clear();
 
         GangsPlusApi.getAllGangs().forEach(gang -> {
             gang.getAllMembers().forEach(member -> {
                 this.plugin.getDatabase().get(member.getUniqueId()).whenComplete((blocks, throwable) -> {
-                    gangBlocks.put(gang, gangBlocks.getOrDefault(gang, 0L) + blocks);
+                    topGangBlocks.put(gang, topGangBlocks.getOrDefault(gang, 0L) + blocks);
                 });
             });
         });
 
-        this.gangBlocks = this.gangBlocks.entrySet()
+        this.topGangBlocks = this.topGangBlocks.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(10)
@@ -53,6 +62,28 @@ public class BlocksTopCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
+        if (this.updating) {
+            sender.sendMessage(StringUtils.colorize(this.plugin.getConfig().getStringList("messages.leaderboard-updating")));
+            return false;
+        }
+
+        System.out.println("TESTESTEST");
+
+        int position = 0;
+        for (String message : this.plugin.getConfig().getStringList("messages.blockstop")) {
+            if (message.startsWith("{FOR_EACH_GANG}")) {
+                message = message.replace("{FOR_EACH_GANG}", "");
+                for (Gang gang : this.topGangBlocks.keySet()) {
+                    sender.sendMessage(StringUtils.colorize(message
+                            .replace("%gang%", gang.getName())
+                            .replace("%position%", String.valueOf(++position))
+                            .replace("%blocks%", NumberUtils.format(this.topGangBlocks.get(gang), NumberFormatType.COMMAS))));
+                }
+            }
+
+            sender.sendMessage(StringUtils.colorize(message));
+        }
+
+        return true;
     }
 }

@@ -25,6 +25,7 @@ public final class BlockCounter extends JavaPlugin {
         loadDatabase();
         hookGangsPlus();
         registerListeners();
+        registerCommands();
     }
 
     private void loadDatabase() {
