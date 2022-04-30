@@ -1,0 +1,11 @@
+name: BlockCounter
+version: '${version}'
+main: com.thepwo.blockcounter.BlockCounter
+api-version: 1.18
+softdepend: [ GangsPlus, PlaceholderAPI ]
+authors: [ TheTrustyPwo ]
+description: Block Counter
+commands:
+  blockstop:
+    aliases: [ blocktop ]
+    description: "Displays the gangs with the most blocks mined!"

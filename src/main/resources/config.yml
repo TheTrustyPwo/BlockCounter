@@ -1,0 +1,24 @@
+database:
+
+  # Database Type: YAML,
+  type: "YAML"
+
+  # Will automatically save the data every this number of seconds
+  autosave-interval: 60
+
+  # Yaml Storage Configuration
+  yaml:
+
+    # Yaml file name
+    file: "data.yml"
+
+messages:
+
+  # The message sent when the player tries to view the leaderboard while it is updating
+  leaderboard-updating:
+    - "&c&l(!) &cLeaderboard is updating! Try again later."
+
+  blockstop:
+    - ""
+    - ""
+    - ""
